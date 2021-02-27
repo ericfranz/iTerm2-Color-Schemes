@@ -4,59 +4,58 @@
 # the new Windows Terminal color scheme format
 #
 # Usage:
-# xrdb2windowsterminal.py path/to/xrdb/files -d /windowsterminal/output
+# xrdb2vscode.py path/to/xrdb/files -d /vscode/output
 
 import os
 import re
 import argparse
+import json
 from xrdbparser import Xrdb
 
 
 def process_file(data):
     # map to Windows Terminal names
     pairs = [
-        ("background", "Background_Color"),
-        ("foreground", "Foreground_Color"),
-        ("cursorColor", "Cursor_Color"),
-        ("selectionBackground", "Selection_Color")
+        ("foreground", "terminal.foreground"),
+        ("background", "terminal.background"),
+        ("cursorColor", "terminalCursor.foreground"),
+        ("selectionBackground", "terminal.selectionBackground")
     ]
 
     ansi = [
-        "black",
-        "red",
-        "green",
-        "yellow",
-        "blue",
-        "purple",
-        "cyan",
-        "white",
-        "brightBlack",
-        "brightRed",
-        "brightGreen",
-        "brightYellow",
-        "brightBlue",
-        "brightPurple",
-        "brightCyan",
-        "brightWhite",
+        "terminal.ansiBlack",
+        "terminal.ansiBlue",
+        "terminal.ansiCyan",
+        "terminal.ansiGreen",
+        "terminal.ansiMagenta",
+        "terminal.ansiRed",
+        "terminal.ansiWhite",
+        "terminal.ansiYellow",
+        "terminal.ansiBrightBlack",
+        "terminal.ansiBrightBlue",
+        "terminal.ansiBrightCyan",
+        "terminal.ansiBrightGreen",
+        "terminal.ansiBrightMagenta",
+        "terminal.ansiBrightRed",
+        "terminal.ansiBrightWhite",
+        "terminal.ansiBrightYellow"
     ]
 
-    lines = ""
+    scheme = OrderedDict()
+
     for i, name in enumerate(ansi):
         color = data.colors[i]
         if color:
-            lines += f',\n  "{name}": "{color}"'
+            scheme[name]: color
 
-    for windowsterminal, xrdb in pairs:
+    for vscode, xrdb in pairs:
         color = getattr(data, xrdb, None)
         if color:
-            lines += f',\n  "{windowsterminal}": "{color}"'
+            scheme[vscode]: color
 
-    lines.rstrip(",")
 
-    return f'''{{
-  "name": "{data.name}"{lines}
-}}
-'''
+    return json.dumps({"workbench.colorCustomizations":scheme}, indent=4)
+
 
 
 def main(xrdb_path, output_path=None):

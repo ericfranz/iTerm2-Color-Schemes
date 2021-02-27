@@ -65,3 +65,5 @@ if __name__ == '__main__':
     print('OK --> ' + '../dynamic-colors/')
     xrdb2alacritty.main('../xrdb/', '../alacritty/')
     print('OK --> ' + '../alacritty/')
+    xrdb2vscode.main('../xrdb/', '../vscode/')
+    print('OK --> ' + '../vscode/')
